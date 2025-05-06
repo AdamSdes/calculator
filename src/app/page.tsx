@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, FormEvent } from "react";
+import { toast } from "sonner";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths, subQuarters, startOfQuarter, endOfQuarter } from "date-fns";
 import { ru } from "date-fns/locale";
 import { CalendarIcon, PlusCircle, Trash2, Download, Upload, Target, Settings2 } from "lucide-react";
@@ -51,7 +52,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"all" | "thisMonth" | "customMonth">("thisMonth");
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
-  const [saveStatus, setSaveStatus] = useState<string | null>(null);
+  // Using sonner toast instead of status state
   // Используем простую инициализацию для серверного рендеринга
   const [monthlyGoal, setMonthlyGoal] = useState<number>(1000);
   const [regularLessonPrice, setRegularLessonPrice] = useState<number>(8);
@@ -112,7 +113,7 @@ export default function Home() {
     
     const saveEntries = async () => {
       try {
-        setSaveStatus("Сохранение...");
+        // Add API call for persistence if available
         const response = await fetch('/api/entries', {
           method: 'POST',
           headers: {
@@ -122,20 +123,15 @@ export default function Home() {
         });
         
         if (!response.ok) {
-          throw new Error('Failed to save entries');
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
         
         // Also save to localStorage as backup
         localStorage.setItem("lessonEntries", JSON.stringify(entries));
-        setSaveStatus("Сохранено");
-        
-        // Clear status after 3 seconds
-        setTimeout(() => {
-          setSaveStatus(null);
-        }, 3000);
+        toast.success("Данные успешно сохранены");
       } catch (error) {
         console.error('Error saving entries:', error);
-        setSaveStatus("Ошибка сохранения");
+        toast.error("Ошибка при сохранении данных");
       }
     };
 
@@ -157,8 +153,7 @@ export default function Home() {
       localStorage.setItem("regularLessonPrice", regularLessonPrice.toString());
       localStorage.setItem("masterClassPrice", masterClassPrice.toString());
     }
-    setSaveStatus("Настройки сохранены");
-    setTimeout(() => setSaveStatus(null), 2000);
+    toast.success("Настройки сохранены");
   };
 
   // Handle form submission
@@ -185,8 +180,7 @@ export default function Home() {
       // Save to localStorage as backup
       localStorage.setItem("lessonEntries", JSON.stringify([...entries, newEntry]));
       
-      setSaveStatus("Запись добавлена");
-      setTimeout(() => setSaveStatus(null), 2000);
+      toast.success("Запись успешно добавлена");
     } finally {
       setIsSubmitting(false);
     }
@@ -340,13 +334,13 @@ export default function Home() {
           });
         } catch (error) {
           console.error("Error parsing CSV line:", line, error);
+          toast.error("Ошибка при импорте файла: неверный формат CSV");
         }
       }
 
       if (newEntries.length > 0) {
         setEntries(prev => [...prev, ...newEntries].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-        setSaveStatus("Импорт завершен");
-        setTimeout(() => setSaveStatus(null), 3000);
+        toast.success(`Импортировано ${newEntries.length} записей`);
       }
     };
     reader.readAsText(file, 'UTF-8'); // Re-add the line to start reading the file
@@ -370,8 +364,7 @@ export default function Home() {
         entry.id === updatedEntry.id ? updatedEntry : entry
       )
     );
-    setSaveStatus("Запись обновлена");
-    setTimeout(() => setSaveStatus(null), 2000);
+    toast.success("Запись успешно обновлена");
   };
 
   // Handle settings save
@@ -504,12 +497,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Save Status Message */}
-        {saveStatus && (
-          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 text-center p-3 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-md shadow-lg z-50 min-w-[200px]">
-            {saveStatus}
-          </div>
-        )}
+        {/* Toast notifications are now handled by Sonner in bottom-right corner */}
         
         {/* Edit Entry Dialog */}
         <EditEntryDialog 
