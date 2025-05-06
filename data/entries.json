@@ -1,0 +1,65 @@
+[
+  {
+    "id": "1746542432727",
+    "date": "2025-05-04",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1746542429869",
+    "date": "2025-05-03",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1746011936491",
+    "date": "2025-04-30",
+    "regularLessons": 2,
+    "masterClasses": 0,
+    "earnings": 24
+  },
+  {
+    "id": "1745833489393",
+    "date": "2025-04-23",
+    "regularLessons": 2,
+    "masterClasses": 0,
+    "earnings": 24
+  },
+  {
+    "id": "1744630819460",
+    "date": "2025-04-13",
+    "regularLessons": 5,
+    "masterClasses": 1,
+    "earnings": 50
+  },
+  {
+    "id": "1744630770207",
+    "date": "2025-04-12",
+    "regularLessons": 4,
+    "masterClasses": 0,
+    "earnings": 32
+  },
+  {
+    "id": "1744630755748",
+    "date": "2025-04-09",
+    "regularLessons": 2,
+    "masterClasses": 0,
+    "earnings": 16
+  },
+  {
+    "id": "1744630739710",
+    "date": "2025-04-06",
+    "regularLessons": 4,
+    "masterClasses": 0,
+    "earnings": 32
+  },
+  {
+    "id": "1744630718534",
+    "date": "2025-04-05",
+    "regularLessons": 4,
+    "masterClasses": 2,
+    "earnings": 52
+  }
+]
