@@ -1,13 +1,174 @@
 [
   {
-    "id": "1746542432727",
+    "id": "1752168099400",
+    "date": "2025-06-29",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1752168087422",
+    "date": "2025-06-28",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1752168044317",
+    "date": "2025-06-22",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1752168066464",
+    "date": "2025-06-22",
+    "regularLessons": 1,
+    "masterClasses": 0,
+    "earnings": 12
+  },
+  {
+    "id": "1752168040169",
+    "date": "2025-06-21",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1752168018715",
+    "date": "2025-06-15",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1752168012670",
+    "date": "2025-06-14",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1752167957192",
+    "date": "2025-06-08",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1752167943659",
+    "date": "2025-06-07",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1752167915707",
+    "date": "2025-06-04",
+    "regularLessons": 2,
+    "masterClasses": 0,
+    "earnings": 24
+  },
+  {
+    "id": "1752167878825",
+    "date": "2025-06-01",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1748849571704",
+    "date": "2025-05-31",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1748849623871",
+    "date": "2025-05-28",
+    "regularLessons": 3,
+    "masterClasses": 0,
+    "earnings": 36
+  },
+  {
+    "id": "1748376858597",
+    "date": "2025-05-26",
+    "regularLessons": 2,
+    "masterClasses": 0,
+    "earnings": 24
+  },
+  {
+    "id": "1748376819317",
+    "date": "2025-05-25",
+    "regularLessons": 7,
+    "masterClasses": 0,
+    "earnings": 84
+  },
+  {
+    "id": "1748376812591",
+    "date": "2025-05-24",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1748376805408",
+    "date": "2025-05-21",
+    "regularLessons": 2,
+    "masterClasses": 0,
+    "earnings": 24
+  },
+  {
+    "id": "1748376795904",
+    "date": "2025-05-18",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1748376782639",
+    "date": "2025-05-17",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1748376777990",
+    "date": "2025-05-14",
+    "regularLessons": 3,
+    "masterClasses": 0,
+    "earnings": 36
+  },
+  {
+    "id": "1748376767631",
+    "date": "2025-05-11",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1748376749503",
+    "date": "2025-05-10",
+    "regularLessons": 6,
+    "masterClasses": 0,
+    "earnings": 72
+  },
+  {
+    "id": "1748376737589",
+    "date": "2025-05-07",
+    "regularLessons": 2,
+    "masterClasses": 0,
+    "earnings": 24
+  },
+  {
+    "id": "1748376657096",
     "date": "2025-05-04",
     "regularLessons": 6,
     "masterClasses": 0,
     "earnings": 72
   },
   {
-    "id": "1746542429869",
+    "id": "1748376654105",
     "date": "2025-05-03",
     "regularLessons": 6,
     "masterClasses": 0,
