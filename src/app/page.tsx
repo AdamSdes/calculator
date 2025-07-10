@@ -29,6 +29,8 @@ import StatsDisplay from "@/components/calculator/StatsDisplay";
 import SettingsDialog from "@/components/calculator/SettingsDialog";
 import DataActions from "@/components/calculator/DataActions";
 import EditEntryDialog from "@/components/calculator/EditEntryDialog";
+import CompanySettings, { CompanyInfo, defaultCompanyInfo } from "@/components/calculator/CompanySettings";
+import InvoiceGenerator from "@/components/calculator/InvoiceGenerator";
 
 // Define types for our data
 type LessonEntry = {
@@ -62,16 +64,22 @@ export default function Home() {
   const [editingEntry, setEditingEntry] = useState<LessonEntry | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
   
+  // Состояние для данных компании и фактур
+  const [companyInfo, setCompanyInfo] = useState<CompanyInfo>(defaultCompanyInfo);
+  const [isCompanySettingsOpen, setIsCompanySettingsOpen] = useState<boolean>(false);
+  
   // Загружаем значения из localStorage только на клиенте с помощью useEffect
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedGoal = localStorage.getItem("monthlyGoal");
       const savedRegularPrice = localStorage.getItem("regularLessonPrice");
       const savedMasterPrice = localStorage.getItem("masterClassPrice");
+      const savedCompanyInfo = localStorage.getItem("companyInfo");
       
       if (savedGoal) setMonthlyGoal(parseInt(savedGoal, 10));
       if (savedRegularPrice) setRegularLessonPrice(parseInt(savedRegularPrice, 10));
       if (savedMasterPrice) setMasterClassPrice(parseInt(savedMasterPrice, 10));
+      if (savedCompanyInfo) setCompanyInfo(JSON.parse(savedCompanyInfo));
     }
   }, []);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -152,8 +160,26 @@ export default function Home() {
       localStorage.setItem("monthlyGoal", monthlyGoal.toString());
       localStorage.setItem("regularLessonPrice", regularLessonPrice.toString());
       localStorage.setItem("masterClassPrice", masterClassPrice.toString());
+      localStorage.setItem("companyInfo", JSON.stringify(companyInfo));
     }
     toast.success("Настройки сохранены");
+  };
+
+  // Save company info
+  const handleSaveCompanyInfo = (newInfo: CompanyInfo) => {
+    setCompanyInfo(newInfo);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem("companyInfo", JSON.stringify(newInfo));
+    }
+  };
+
+  // Handle invoice generation
+  const handleInvoiceGenerated = (invoiceNumber: number) => {
+    const updatedInfo = { ...companyInfo, lastInvoiceNumber: invoiceNumber };
+    setCompanyInfo(updatedInfo);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem("companyInfo", JSON.stringify(updatedInfo));
+    }
   };
 
   // Handle form submission
@@ -388,6 +414,17 @@ export default function Home() {
               currentMasterPrice={masterClassPrice}
               onSave={handleSaveSettings}
             />
+            <CompanySettings
+              companyInfo={companyInfo}
+              onSave={handleSaveCompanyInfo}
+            />
+            <InvoiceGenerator
+              entries={entries}
+              companyInfo={companyInfo}
+              regularLessonPrice={regularLessonPrice}
+              masterClassPrice={masterClassPrice}
+              onInvoiceGenerated={handleInvoiceGenerated}
+            />
             <DataActions
               exportToCSV={exportToCSV}
               importFromCSV={importFromCSV}
@@ -498,6 +535,18 @@ export default function Home() {
         </div>
 
         {/* Toast notifications are now handled by Sonner in bottom-right corner */}
+        
+        {/* Edit Entry Dialog */}
+        <EditEntryDialog 
+          entry={editingEntry}
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+          onSave={handleSaveEditedEntry}
+          regularLessonPrice={regularLessonPrice}
+          masterClassPrice={masterClassPrice}
+        />
+        
+        {/* Company Settings Dialog */}
         
         {/* Edit Entry Dialog */}
         <EditEntryDialog 
