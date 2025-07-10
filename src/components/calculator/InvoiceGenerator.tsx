@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -49,7 +50,7 @@ const defaultClientInfo: ClientInfo = {
   name: "Mariia Kapkanets",
   address: "Zuzany Chalupovej 4029/9",
   city: "Bratislava – mestská časť Petržalka",
-  postalCode: "85107",
+  postalCode: "851 07",
   ico: "55110738",
   icDph: "SK3121426803"
 };
@@ -66,6 +67,10 @@ export default function InvoiceGenerator({
   const [endDate, setEndDate] = useState<Date>(endOfMonth(new Date()));
   const [clientInfo, setClientInfo] = useState<ClientInfo>(defaultClientInfo);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [useManualAmount, setUseManualAmount] = useState(false);
+  const [manualAmount, setManualAmount] = useState<string>('');
+  const [useManualHours, setUseManualHours] = useState(false);
+  const [manualHours, setManualHours] = useState<string>('');
   
   const invoiceRef = useRef<HTMLDivElement>(null);
 
@@ -78,8 +83,10 @@ export default function InvoiceGenerator({
   // Расчет итогов
   const totalRegularLessons = filteredEntries.reduce((sum, entry) => sum + entry.regularLessons, 0);
   const totalMasterClasses = filteredEntries.reduce((sum, entry) => sum + entry.masterClasses, 0);
-  const totalHours = totalRegularLessons + totalMasterClasses;
-  const totalAmount = filteredEntries.reduce((sum, entry) => sum + entry.earnings, 0);
+  const calculatedHours = totalRegularLessons + totalMasterClasses;
+  const totalHours = useManualHours ? parseFloat(manualHours) || 0 : calculatedHours;
+  const calculatedAmount = filteredEntries.reduce((sum, entry) => sum + entry.earnings, 0);
+  const totalAmount = useManualAmount ? parseFloat(manualAmount) || 0 : calculatedAmount;
 
   const nextInvoiceNumber = companyInfo.lastInvoiceNumber + 1;
 
@@ -285,11 +292,85 @@ export default function InvoiceGenerator({
                 </div>
                 <Separator />
                 <div className="flex justify-between font-semibold">
+                  <span>Общее количество часов:</span>
+                  <span>{totalHours} ч.</span>
+                </div>
+                <div className="flex justify-between font-semibold">
                   <span>Общая сумма:</span>
                   <span>{totalAmount.toFixed(2)} €</span>
                 </div>
               </div>
             </div>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Количество часов</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="manual-hours"
+                    checked={useManualHours}
+                    onCheckedChange={setUseManualHours}
+                  />
+                  <Label htmlFor="manual-hours" className="text-sm">
+                    Указать часы вручную
+                  </Label>
+                </div>
+                {useManualHours && (
+                  <div className="space-y-2">
+                    <Label>Количество часов</Label>
+                    <Input
+                      type="number"
+                      step="0.5"
+                      value={manualHours}
+                      onChange={(e) => setManualHours(e.target.value)}
+                      placeholder="0"
+                    />
+                  </div>
+                )}
+                {!useManualHours && (
+                  <div className="text-sm text-muted-foreground">
+                    Часы рассчитываются автоматически: {calculatedHours} ч.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Сумма к оплате</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="manual-amount"
+                    checked={useManualAmount}
+                    onCheckedChange={setUseManualAmount}
+                  />
+                  <Label htmlFor="manual-amount" className="text-sm">
+                    Указать сумму вручную
+                  </Label>
+                </div>
+                {useManualAmount && (
+                  <div className="space-y-2">
+                    <Label>Сумма (€)</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={manualAmount}
+                      onChange={(e) => setManualAmount(e.target.value)}
+                      placeholder="0.00"
+                    />
+                  </div>
+                )}
+                {!useManualAmount && (
+                  <div className="text-sm text-muted-foreground">
+                    Сумма рассчитывается автоматически: {calculatedAmount.toFixed(2)} €
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Превью фактуры */}
@@ -350,18 +431,25 @@ const InvoicePreview = React.forwardRef<
       {/* Заголовок */}
       <div className="flex justify-between items-start mb-8 pb-6 border-b border-[#e5e5e5]">
         <div>
-          <h1 className="text-2xl font-semibold mb-1" style={{ color: '#171717' }}>FAKTÚRA</h1>
-          <p className="text-sm" style={{ color: '#737373' }}>#{invoiceNumber}</p>
+          <h1 className="text-2xl font-semibold mb-1" style={{ color: '#171717' }}>FAKTÚRA číslo: {invoiceNumber}</h1>
+          <div className="text-sm space-y-1 mt-2" style={{ color: '#737373' }}>
+            <div>Objednávka:</div>
+            <div>Dodací list:</div>
+          </div>
         </div>
         
         <div className="text-right text-sm space-y-1">
           <div className="flex justify-between gap-8">
-            <span style={{ color: '#737373' }}>Dátum vystavenia:</span>
+            <span style={{ color: '#737373' }}>Dátum vyhotovenia:</span>
             <span className="font-medium" style={{ color: '#262626' }}>{format(today, "dd.MM.yyyy")}</span>
           </div>
           <div className="flex justify-between gap-8">
             <span style={{ color: '#737373' }}>Dátum splatnosti:</span>
             <span className="font-medium" style={{ color: '#262626' }}>{format(dueDate, "dd.MM.yyyy")}</span>
+          </div>
+          <div className="flex justify-between gap-8">
+            <span style={{ color: '#737373' }}>Dátum dodania:</span>
+            <span className="font-medium" style={{ color: '#262626' }}>od {format(startDate, "dd.MM.yyyy")} do {format(endDate, "dd.MM.yyyy")}</span>
           </div>
         </div>
       </div>
@@ -372,17 +460,17 @@ const InvoicePreview = React.forwardRef<
         <div style={{ backgroundColor: '#fafafa' }} className="p-6 rounded-lg border border-[#f5f5f5]">
           <div className="text-xs font-medium uppercase tracking-wide mb-3" style={{ color: '#737373' }}>DODÁVATEĽ</div>
           <div className="space-y-2">
-            <div className="font-semibold text-base" style={{ color: '#171717' }}>{companyInfo.name}</div>
-            <div style={{ color: '#737373' }}>{companyInfo.address}</div>
-            <div style={{ color: '#737373' }}>{companyInfo.postalCode} {companyInfo.city}</div>
+            <div className="font-semibold text-base" style={{ color: '#171717' }}>Maksym Lovska</div>
+            <div style={{ color: '#737373' }}>Púpavová 684/30</div>
+            <div style={{ color: '#737373' }}>841 04 Bratislava-Karlova Ves</div>
             <div className="pt-2 mt-3 border-t border-[#e5e5e5] space-y-1 text-sm">
               <div className="flex justify-between">
                 <span style={{ color: '#737373' }}>IČO:</span>
-                <span style={{ color: '#262626' }}>{companyInfo.ico}</span>
+                <span style={{ color: '#262626' }}>56 718 764</span>
               </div>
               <div className="flex justify-between">
                 <span style={{ color: '#737373' }}>DIČ:</span>
-                <span style={{ color: '#262626' }}>{companyInfo.dic}</span>
+                <span style={{ color: '#262626' }}>3122104480</span>
               </div>
             </div>
           </div>
@@ -416,49 +504,59 @@ const InvoicePreview = React.forwardRef<
           <div className="space-y-2">
             <div className="flex justify-between">
               <span style={{ color: '#737373' }}>Číslo účtu:</span>
-              <span className="font-mono" style={{ color: '#262626' }}>{companyInfo.bankAccount}</span>
+              <span className="font-mono" style={{ color: '#262626' }}>SK80 0200 0000 0060 9684 2458</span>
             </div>
             <div className="flex justify-between">
               <span style={{ color: '#737373' }}>SWIFT:</span>
-              <span className="font-mono" style={{ color: '#262626' }}>{companyInfo.swift}</span>
+              <span className="font-mono" style={{ color: '#262626' }}>SUBASKBX</span>
             </div>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span style={{ color: '#737373' }}>Variabilný symbol:</span>
+              <span style={{ color: '#737373' }}>VS:</span>
               <span className="font-mono" style={{ color: '#262626' }}>{invoiceNumber}</span>
             </div>
             <div className="flex justify-between">
-              <span style={{ color: '#737373' }}>Spôsob úhrady:</span>
+              <span style={{ color: '#737373' }}>Forma úhrady:</span>
               <span style={{ color: '#262626' }}>Platba kartou</span>
             </div>
+          </div>
+        </div>
+        <div className="mt-4 pt-3 border-t border-[#e5e5e5] text-sm">
+          <div className="flex justify-between">
+            <span style={{ color: '#737373' }}>Spôsob dopravy:</span>
+            <span style={{ color: '#262626' }}>Služba</span>
           </div>
         </div>
       </div>
 
       {/* Tabuľka služieb */}
       <div className="mb-8">
-        <div className="text-xs font-medium uppercase tracking-wide mb-4" style={{ color: '#737373' }}>POSKYTNUTÉ SLUŽBY</div>
+        <div className="text-xs font-medium uppercase tracking-wide mb-4" style={{ color: '#737373' }}>Fakturujeme Vám</div>
         <div className="border border-[#e5e5e5] rounded-lg overflow-hidden">
           <table className="w-full">
             <thead style={{ backgroundColor: '#f5f5f5' }}>
               <tr className="border-b border-[#e5e5e5]">
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#737373' }}>P.č.</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#737373' }}>P.č</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#737373' }}>Číslo položky</th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: '#737373' }}>Názov položky</th>
-                <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider" style={{ color: '#737373' }}>MJ</th>
                 <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider" style={{ color: '#737373' }}>Množstvo</th>
+                <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider" style={{ color: '#737373' }}>MJ</th>
+                <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider" style={{ color: '#737373' }}>Zľava %</th>
                 <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider" style={{ color: '#737373' }}>Jednotková cena</th>
                 <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider" style={{ color: '#737373' }}>Cena spolu</th>
               </tr>
             </thead>
             <tbody className="bg-white">
               <tr>
-                <td className="px-4 py-4 text-sm font-medium" style={{ color: '#262626' }}>1</td>
-                <td className="px-4 py-4 text-sm" style={{ color: '#171717' }}>Vyučovacie služby</td>
-                <td className="px-4 py-4 text-center text-sm" style={{ color: '#737373' }}>hod.</td>
+                <td className="px-4 py-4 text-sm font-medium" style={{ color: '#262626' }}>1.</td>
+                <td className="px-4 py-4 text-sm" style={{ color: '#737373' }}></td>
+                <td className="px-4 py-4 text-sm" style={{ color: '#171717' }}>Upratovacie služby</td>
                 <td className="px-4 py-4 text-center text-sm font-semibold" style={{ color: '#171717' }}>{totalHours}</td>
-                <td className="px-4 py-4 text-center text-sm" style={{ color: '#737373' }}>-</td>
-                <td className="px-4 py-4 text-center text-sm font-semibold" style={{ color: '#171717' }}>{totalAmount.toFixed(2)} €</td>
+                <td className="px-4 py-4 text-center text-sm" style={{ color: '#737373' }}>h.</td>
+                <td className="px-4 py-4 text-center text-sm" style={{ color: '#737373' }}></td>
+                <td className="px-4 py-4 text-center text-sm" style={{ color: '#737373' }}></td>
+                <td className="px-4 py-4 text-center text-sm font-semibold" style={{ color: '#171717' }}>{totalAmount.toFixed(2)}</td>
               </tr>
             </tbody>
           </table>
@@ -471,29 +569,29 @@ const InvoicePreview = React.forwardRef<
           <div className="space-y-3">
             <div className="flex justify-between items-center py-2 text-sm">
               <span style={{ color: '#737373' }}>Celková fakturovaná suma:</span>
-              <span className="font-medium" style={{ color: '#262626' }}>{totalAmount.toFixed(2)} €</span>
+              <span className="font-medium" style={{ color: '#262626' }}>EUR {totalAmount.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center py-3 px-4 rounded-md" style={{ backgroundColor: '#171717', color: 'white' }}>
-              <span className="font-semibold">K ÚHRADE:</span>
-              <span className="font-bold text-lg">{totalAmount.toFixed(2)} €</span>
+              <span className="font-semibold">K úhrade:</span>
+              <span className="font-bold text-lg">EUR {totalAmount.toFixed(2)}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Poznámka o DPH */}
-      <div className="border-l-4 p-4 mb-8 rounded-r-md" style={{ backgroundColor: '#fafafa', borderLeftColor: '#d4d4d4' }}>
-        <div className="text-sm" style={{ color: '#737373' }}>
-          <strong style={{ color: '#262626' }}>Poznámka:</strong> Dodávateľ nie je platiteľom DPH.
+      <div className="mb-8">
+        <div className="text-sm" style={{ color: '#171717' }}>
+          Dodávateľ nie je platiteľ DPH.
         </div>
       </div>
 
       {/* Podpis */}
       <div className="text-center mt-12 pt-8 border-t border-[#e5e5e5]">
         <div className="inline-block">
-          <div className="font-semibold text-lg mb-6" style={{ color: '#171717' }}>{companyInfo.name}</div>
+          <div className="font-semibold text-lg mb-6" style={{ color: '#171717' }}>Maksym Lovska</div>
           <div className="w-48 border-t pt-2 text-sm" style={{ borderTopColor: '#d4d4d4', color: '#737373' }}>
-            Podpis a pečiatka
+            Pečiatka a podpis
           </div>
         </div>
       </div>
